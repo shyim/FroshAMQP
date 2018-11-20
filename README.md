@@ -34,7 +34,7 @@ After the activation of the Plugin all backlogs will be send to the AMQP Server.
 
 ## Implement more Queue's?
 
-Publish the message using the `SimpleMessagePublisher`, create a new Command and extend it from `AbstractWorkerCommand`
+Publish the message using the `SimpleMessagePublisher`, create a new Command, extend it from `AbstractWorkerCommand` and implement the `processMessage` method
 
 ## Contributing
 
