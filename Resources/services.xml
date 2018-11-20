@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="frosh_amqp.components.es_backlog_writer" class="FroshAMQP\Components\EsBacklogWriter" decorates="shopware_elastic_search.backlog_processor">
+            <argument type="service" id="frosh_amqp.components.es_backlog_writer.inner"/>
+            <argument type="service" id="frosh_amqp.components.simple_message_publisher"/>
+        </service>
+
+        <service id="php_amqp_lib.connection.amqpstream_connection" class="PhpAmqpLib\Connection\AMQPStreamConnection">
+            <argument>%shopware.amqp.host%</argument>
+            <argument>%shopware.amqp.port%</argument>
+            <argument>%shopware.amqp.username%</argument>
+            <argument>%shopware.amqp.password%</argument>
+        </service>
+
+        <service id="frosh_amqp.commands.elastic_worker_command" class="FroshAMQP\Commands\FrontendElasticBacklogWorkerCommand">
+            <tag name="console.command" command="frosh:es:worker"/>
+        </service>
+
+        <service id="frosh_amqp.commands.backend_elastic_worker_command" class="FroshAMQP\Commands\BackendElasticBacklogWorkerCommand">
+            <tag name="console.command" command="frosh:es:backend:worker"/>
+        </service>
+
+        <service class="FroshAMQP\Components\SimpleMessagePublisher" id="frosh_amqp.components.simple_message_publisher">
+            <argument type="service" id="php_amqp_lib.connection.amqpstream_connection"/>
+        </service>
+
+        <service class="FroshAMQP\Components\BackendOrmBacklogSubscriber" id="frosh_amqp.components.backend_orm_backlog_subscriber" decorates="shopware_bundle.es_backend_subscriber.orm_backlog_subscriber">
+            <argument type="service" id="service_container"/>
+            <argument type="service" id="frosh_amqp.components.simple_message_publisher"/>
+        </service>
+    </services>
+</container>
